@@ -1,0 +1,149 @@
+{
+  "manifest_version": "1.0",
+  "phase": "2.5A",
+  "title": "Protocol/Reconnect Full-Session Controlled Soak",
+
+  "run_id_template": "p2.5a-{date}-{attempt}",
+
+  "token_source": "DHAN_ACCESS_TOKEN environment variable (never in repo)",
+
+  "desired_universe": {
+    "index": "NIFTY",
+    "expiry_type": "weekly",
+    "weekly_expiry_date": "2026-07-21",
+    "atm_strike": 24000,
+    "strike_range_min": -5,
+    "strike_range_max": 5,
+    "strike_interval": 50,
+    "option_types": ["CE", "PE"],
+    "security_ids": [
+      57331, 57332, 57333, 57334, 57335,
+      57336, 57337, 57338, 57339, 57340,
+      57341, 57342, 57343, 57344, 57345,
+      57346, 57347, 57348, 57349, 57350,
+      57351, 57352, 57353, 57354, 57355,
+      57356, 57357, 57358, 57359, 57360,
+      57361, 57362, 57363, 57364, 57365,
+      57366, 57367
+    ]
+  },
+
+  "critical_universe": {
+    "underlying": [24000],
+    "atm_plus_1": [57336, 57337],
+    "atm_minus_1": [57334, 57335],
+    "atm_center": [57335, 57336],
+    "description": "ATM±1 CE+PE for NIFTY weekly 24000 strike"
+  },
+
+  "coverage_thresholds": {
+    "transport_healthy_min_instruments": 2,
+    "critical_universe_required_ratio": 1.0,
+    "critical_universe_required_absolute": 4,
+    "broad_universe_required_ratio": 0.8,
+    "broad_universe_required_absolute": 30,
+    "min_healthy_instruments": 2,
+    "note_min_healthy": "2 for unit tests; production uses critical_universe_required_absolute"
+  },
+
+  "stall_thresholds": {
+    "max_stall_seconds": 300,
+    "stall_warning_seconds": 60,
+    "max_consecutive_stalls": 3
+  },
+
+  "subscription_thresholds": {
+    "desired_count": 37,
+    "max_desired_not_sent": 0,
+    "max_sent_not_seen": 0,
+    "max_seen_not_desired": 0,
+    "max_duplicate_send": 0
+  },
+
+  "forced_events": {
+    "enabled": true,
+    "schedule": [
+      {
+        "time_after_start_s": 120,
+        "event": "forced_disconnect",
+        "description": "Kill socket after 2 min to test clean reconnect"
+      },
+      {
+        "time_after_start_s": 600,
+        "event": "universe_grow",
+        "description": "Add 5 outer strikes to test subscribe-on-reconnect"
+      },
+      {
+        "time_after_start_s": 1200,
+        "event": "forced_disconnect",
+        "description": "Second forced disconnect during mid-session"
+      },
+      {
+        "time_after_start_s": 1800,
+        "event": "universe_shrink",
+        "description": "Remove 5 strikes to test unsubscribe flow"
+      },
+      {
+        "time_after_start_s": 2400,
+        "event": "atm_rotation",
+        "description": "Rotate ATM from 24000 to 24050 to test hysteresis"
+      },
+      {
+        "time_after_start_s": 3000,
+        "event": "forced_disconnect",
+        "description": "Third forced disconnect — verify subscription replay after rotation"
+      },
+      {
+        "time_after_start_s": 3600,
+        "event": "writer_slowdown",
+        "description": "Temporarily slow writer to test backpressure"
+      },
+      {
+        "time_after_start_s": 4200,
+        "event": "stale_callback_simulation",
+        "description": "Inject fake old-gen packet to test generation guard"
+      }
+    ]
+  },
+
+  "pass_criteria": {
+    "continuity": "PASS",
+    "unhandled_exceptions": 0,
+    "desired_subscription_losses": 0,
+    "stale_callback_mutations": 0,
+    "all_reconnects_recovered": true,
+    "subscription_replay_pct": 100,
+    "underlying_coverage_pct": 100,
+    "critical_atm_coverage_pct": 100,
+    "max_unexplained_stall_s": 5,
+    "silent_decoder_failures": 0
+  },
+
+  "minimum_report_fields": [
+    "desired_count",
+    "sent_count",
+    "seen_count",
+    "critical_seen_count",
+    "desired_not_sent",
+    "sent_not_seen",
+    "seen_not_desired",
+    "duplicate_send_count",
+    "reconnect_count",
+    "successful_recoveries",
+    "restore_latency_s",
+    "first_packet_latency_s",
+    "universe_ready_latency_s",
+    "longest_packet_gap_s",
+    "total_stalled_seconds"
+  ],
+
+  "inference_gate": {
+    "inference_allowed": false,
+    "required_conditions": [
+      "transport_healthy",
+      "critical_universe_ready",
+      "bar_engine_ready",
+      "feature_warmup_ready"
+    ]
+  }
+}

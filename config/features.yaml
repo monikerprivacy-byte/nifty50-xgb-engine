@@ -1,0 +1,44 @@
+version: 1.0.0
+last_updated: 2026-07-16
+
+families:
+  price_derived:
+    enabled: true
+    include: [returns, volatility_range, gap, overnight, vwap_deviation]
+  
+  microstructure:
+    enabled: true
+    include: [spread_bps, depth_imbalance, trade_intensity, order_book_skew]
+  
+  options_chain:
+    enabled: true
+    source: dhan_optionchain
+    include: [iv, delta, gamma, theta, vega, oi_change, pcr_volume, pcr_oi]
+    features_from_greeks: true
+
+  rolling_surface:
+    enabled: true
+    source: dhan_rollingoption
+    include: [iv_level, iv_skew, iv_curvature, surface_oi, surface_volume]
+    training_allowed: false  # NOT for contract-level training
+
+  cross_sectional:
+    enabled: true
+    include: [sector_ranking, momentum_breadth, correlation_breakdown]
+
+  technical:
+    enabled: true
+    include: [rsi, macd, bollinger, atr, support_resistance, effort_result]
+
+  regime:
+    enabled: true
+    include: [vix_level, vix_change, trend_regime, volatility_regime, liquidity_regime]
+
+  temporal:
+    enabled: true
+    include: [time_of_day, day_of_week, expiry_distance, minutes_to_expiry]
+
+timestamp_contract:
+  event_time: required
+  available_time: required
+  input_cutoff_time: required

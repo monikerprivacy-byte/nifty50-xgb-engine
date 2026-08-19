@@ -1,0 +1,28 @@
+dhan:
+  client_id: "1110480081"
+  access_token: "${DHAN_ACCESS_TOKEN}"
+  data_plan: active
+  base_url:
+    rest: "https://api.dhan.co/v2"
+    websocket: "wss://api.dhan.co/v2/marketfeed"
+  rate_limits:
+    historical: 5  # req/s
+    option_chain: 1  # per 3s per underlying
+    quote: 1  # req/s
+  websocket:
+    max_connections: 5
+    max_instruments_per_connection: 5000
+    max_subscription_batch: 100
+    modes: [ticker, quote, full]
+    depth_levels: [5, 20, 200]
+
+nse_bhavcopy:
+  enabled: true
+  base_url: "https://www.nseindia.com/api"
+  rate_limit: 0.5  # req/s (be polite)
+  user_agent_required: true
+
+hermes:
+  enabled: false  # Phase 15
+  role: sidecar
+  permissions: read_only

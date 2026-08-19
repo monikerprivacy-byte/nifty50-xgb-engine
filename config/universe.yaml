@@ -1,0 +1,31 @@
+index: NIFTY-50
+universe_type: point_in_time_membership
+source: dhan_security_master
+
+stock_options:
+  enabled: true
+  nifty50_only: true
+  strike_range: [-5, 5]  # ATM-5 to ATM+5
+  option_types: [CE, PE]
+  expiries: [nearest, next]  # primary + secondary
+
+cash:
+  enabled: true
+
+futures:
+  enabled: true
+  types: [stock_futures, index_futures]
+
+indices:
+  - NIFTY 50
+  - NIFTY BANK
+  - INDIA VIX
+
+surface:
+  enabled: true
+  source: dhan_rollingoption
+  usage: feature_research_only
+
+membership:
+  update_frequency: daily
+  cache_path: data/bronze/membership/

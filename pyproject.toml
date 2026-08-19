@@ -1,0 +1,5 @@
+[tool.pytest.ini_options]
+markers = [
+    "integration: tests requiring external services or network",
+    "dhan_live: tests requiring live Dhan credentials and WebSocket connection",
+]
